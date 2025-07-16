@@ -26,13 +26,11 @@ function parseInputFile(fileName: string){
 
 const INPUT_FILE_NAME = 'input.txt'
 
-// console.log(
-//   parseInputFile(INPUT_FILE_NAME)
-// )
-
+// INPUTS:
 const testInput = `xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))`
 const realInput = parseInputFile(INPUT_FILE_NAME) ?? ''
 
+// REGEXES:
 const FIRST_NUM_UNCLOSED = /^mul\((\d{1,3})$/ // Matches "mul(" followed by 1 to 3 digits (e.g., "mul(1", "mul(12", "mul(123")
 const FIRST_NUM_COMMA = /^mul\((\d{1,3}),$/ // Matches "mul(" followed by 1 to 3 digits and a comma (e.g., "mul(1,", "mul(12,", "mul(123,")
 const TWO_NUMS_UNCLOSED = /^mul\((\d{1,3}),(\d{1,3})$/ // Matches "mul(" followed by 1-3 digits, a comma, and 1-3 digits (e.g., "mul(1,1", "mul(12,123")
@@ -45,12 +43,61 @@ const PATTERNS = [
   FULL_MATCH
 ];
 
-let matches = []
-let latest = ''
+function findMatches(input: string): string[]{
+  let matches = []
+  let latest = ''
 
-function resetLatest(){
-  latest = ''
+  function resetLatest(){
+    latest = ''
+  }
+
+  for(let i =0; i< input.length; i++){
+    const currentChar = input[i]
+
+    if(latest.length === 0){ // start queue
+      if(currentChar === 'm'){
+        latest += currentChar
+      }
+    } else {
+      if(latest.length === 1){
+        if(currentChar === 'u'){
+          latest += currentChar
+        } else {
+          resetLatest()
+        }
+      } else if (latest.length === 2){
+        if(currentChar === 'l'){
+          latest += currentChar
+        } else {
+          resetLatest()
+        }
+      } else if(latest.length === 3){
+        if(currentChar === '('){
+          latest += currentChar
+        } else {
+          resetLatest()
+        }
+      } else {
+        latest += currentChar
+        if(!PATTERNS.some(regex => regex.test(latest))){
+          resetLatest()
+        } else {
+          if(FULL_MATCH.test(latest)){
+            matches.push(latest)
+            resetLatest()
+          }
+        }
+      }
+    }
+  }
+
+  return matches
 }
+
+const testMatches = findMatches(testInput)
+const realMatches = findMatches(realInput)
+console.log('test matches: ', testMatches)
+console.log('real matches: ', realMatches)
 
 function findMultiple(str: string){
   const charsToFilter = ['m','u','l','(',')']
@@ -64,52 +111,15 @@ function findMultiple(str: string){
   return nums[0] * nums[1]
 }
 
-for(let i =0; i< realInput.length; i++){
-  const currentChar = realInput[i]
-
-  if(latest.length === 0){ // start queue
-    if(currentChar === 'm'){
-      latest += currentChar
-    }
-  } else {
-    if(latest.length === 1){
-      if(currentChar === 'u'){
-        latest += currentChar
-      } else {
-        resetLatest()
-      }
-    } else if (latest.length === 2){
-      if(currentChar === 'l'){
-        latest += currentChar
-      } else {
-        resetLatest()
-      }
-    } else if(latest.length === 3){
-      if(currentChar === '('){
-        latest += currentChar
-      } else {
-        resetLatest()
-      }
-    } else {
-      latest += currentChar
-      if(!PATTERNS.some(regex => regex.test(latest))){
-        resetLatest()
-      } else {
-        if(FULL_MATCH.test(latest)){
-          matches.push(latest)
-          resetLatest()
-        }
-      }
-    }
-  }
+function findTotal(matches: string[]): number{
+  let total = 0
+  matches.forEach(el => {
+    console.log(findMultiple(el))
+    total += findMultiple(el)
+  })
+  return total
 }
 
-console.log(matches)
 
-let total = 0
-matches.forEach(el => {
-  console.log(findMultiple(el))
-  total += findMultiple(el)
-})
-
-console.log("TOTAL:",total)
+console.log('Found test total:', findTotal(testMatches))
+console.log('Found real total:', findTotal(realMatches))
