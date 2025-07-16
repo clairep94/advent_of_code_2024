@@ -1,0 +1,20 @@
+{
+  "name": "advent-of-code-simple",
+  "version": "1.0.0",
+  "description": "My simple Advent of Code solutions (Node.js & TypeScript)",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node"
+  },
+  "keywords": [
+    "advent-of-code",
+    "typescript",
+    "node"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.0.0"
+  }
+}
