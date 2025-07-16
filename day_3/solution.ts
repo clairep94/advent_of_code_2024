@@ -26,17 +26,46 @@ function parseInputFile(fileName: string){
 
 const INPUT_FILE_NAME = 'input.txt'
 
-console.log(
-  parseInputFile(INPUT_FILE_NAME)
-)
+// console.log(
+//   parseInputFile(INPUT_FILE_NAME)
+// )
 
 const testInput = `xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))`
+const realInput = parseInputFile(INPUT_FILE_NAME) ?? ''
+
+const FIRST_NUM_UNCLOSED = /^mul\((\d{1,3})$/ // Matches "mul(" followed by 1 to 3 digits (e.g., "mul(1", "mul(12", "mul(123")
+const FIRST_NUM_COMMA = /^mul\((\d{1,3}),$/ // Matches "mul(" followed by 1 to 3 digits and a comma (e.g., "mul(1,", "mul(12,", "mul(123,")
+const TWO_NUMS_UNCLOSED = /^mul\((\d{1,3}),(\d{1,3})$/ // Matches "mul(" followed by 1-3 digits, a comma, and 1-3 digits (e.g., "mul(1,1", "mul(12,123")
+const FULL_MATCH = /^mul\((\d{1,3}),(\d{1,3})\)$/ // Matches "mul(" followed by 1-3 digits, a comma, 1-3 digits, and a closing parenthesis (e.g., "mul(1,1)", "mul(12,123)")
+
+const PATTERNS = [
+  FIRST_NUM_UNCLOSED,
+  FIRST_NUM_COMMA,
+  TWO_NUMS_UNCLOSED,
+  FULL_MATCH
+];
 
 let matches = []
 let latest = ''
 
-for(let i =0; i< testInput.length; i++){
-  const currentChar = testInput[i]
+function resetLatest(){
+  latest = ''
+}
+
+function findMultiple(str: string){
+  const charsToFilter = ['m','u','l','(',')']
+  const removedStr = str
+    .split('')
+    .filter( el => !charsToFilter.includes(el))
+    .join('')
+
+  const nums = removedStr.split(',').map(el => Number(el))
+  
+  return nums[0] * nums[1]
+}
+
+for(let i =0; i< realInput.length; i++){
+  const currentChar = realInput[i]
 
   if(latest.length === 0){ // start queue
     if(currentChar === 'm'){
@@ -47,53 +76,40 @@ for(let i =0; i< testInput.length; i++){
       if(currentChar === 'u'){
         latest += currentChar
       } else {
-        latest = ''
+        resetLatest()
       }
     } else if (latest.length === 2){
       if(currentChar === 'l'){
         latest += currentChar
       } else {
-        latest = ''
+        resetLatest()
       }
     } else if(latest.length === 3){
       if(currentChar === '('){
         latest += currentChar
       } else {
-        latest = ''
+        resetLatest()
       }
-    } else if( latest.length === 4 ){
-      const numAttempt = Number(currentChar)
-      if(!isNaN(numAttempt)){
-        latest += currentChar
-
-        //temporary
-        matches.push(latest)
-        latest = ''
+    } else {
+      latest += currentChar
+      if(!PATTERNS.some(regex => regex.test(latest))){
+        resetLatest()
       } else {
-        latest = ''
+        if(FULL_MATCH.test(latest)){
+          matches.push(latest)
+          resetLatest()
+        }
       }
     }
   }
 }
 
 console.log(matches)
-// traverse string via pop & queue
-  // find matches for mul(X,Y) -- X and Y are 1-3 digits max 
-    // escape early and continue if no match -- use regex??
-  // if found full-match
-    // sum += multiplication
 
-const PATTERNS = {
-  1: /^m$/, //m
-  2: /^mu$/, //mu
-  3: /^mul$/, //mul
-  4: /^mul\($/, //mul(
-  5: /^mul\((\d{1,3})$/,
-  6: /^mul\((\d{1,3})\)$/,
-  7: /^mul\((\d{1,3})\),$/
-}
-const partialMatchRegex = /^mul\((\d{1,3})\),$/ // mul(1, mul(12, mul(123,
-const fullMatchRegex = /^mul\(\d{1,3},\d{1,3}$/ // mul(1,12) etc.
+let total = 0
+matches.forEach(el => {
+  console.log(findMultiple(el))
+  total += findMultiple(el)
+})
 
-
-
+console.log("TOTAL:",total)
