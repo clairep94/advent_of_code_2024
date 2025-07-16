@@ -83,21 +83,38 @@ function removeCurrentElAndCheckSafety(row: number[]): boolean{
       const copy = structuredClone(row) //idk if this is necessary but to avoid mutation
 
       copy.splice(i, 1)
-      console.log('copy with el removed:', row[i], copy, evaluateRowSafety(copy))
+      // console.log('copy with el removed:', row[i], copy, evaluateRowSafety(copy))
       if(evaluateRowSafety(copy)){
         return true
       }
     }
   }
-  
+
   return false // reached end of row and none of the remove els copies pass
 }
 
 console.log('tolerant check:')
 testMatrix.forEach(el => {
-  console.log("FOR ROW:", el, ":")
-  removeCurrentElAndCheckSafety(el)
+  console.log("FOR ROW:", el, ":", removeCurrentElAndCheckSafety(el))
 })
 
+/**
+ * Count safe rows using the tolerant version of the check -- removeCurrentElAndCheckSafety
+ * @param matrix 
+ * @returns 
+ */
+function tolerantCountSafeRows(matrix: number[][]): number{
+  let count = 0
+
+  for(let i =0; i<matrix.length; i++){
+    if(removeCurrentElAndCheckSafety(matrix[i])){
+      count++
+    }
+  }
+
+  return count
+}
+console.log('test input TOLERANT safe rowcount', tolerantCountSafeRows(testMatrix))
+console.log('actual input TOLERANT safe rowcount', tolerantCountSafeRows(realMatrix))
 
 
