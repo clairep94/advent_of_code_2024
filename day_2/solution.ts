@@ -68,3 +68,36 @@ console.log('test input safe rowcount', countSafeRows(testMatrix))
 console.log('actual input safe rowcount', countSafeRows(realMatrix))
 
 // Part 2:
+// https://adventofcode.com/2024/day/2#part2
+
+/**
+ * Remove current element and check if row is safe
+ * @param row 
+ * @returns 
+ */
+function removeCurrentElAndCheckSafety(row: number[]): boolean{
+  if(evaluateRowSafety(row)){ return true } // only start the tolerant check if necessary
+
+  else {
+    for(let i=0; i<row.length; i++){
+      const copy = structuredClone(row) //idk if this is necessary but to avoid mutation
+
+      copy.splice(i, 1)
+      console.log('copy with el removed:', row[i], copy, evaluateRowSafety(copy))
+      if(evaluateRowSafety(copy)){
+        return true
+      }
+    }
+  }
+  
+  return false // reached end of row and none of the remove els copies pass
+}
+
+console.log('tolerant check:')
+testMatrix.forEach(el => {
+  console.log("FOR ROW:", el, ":")
+  removeCurrentElAndCheckSafety(el)
+})
+
+
+
