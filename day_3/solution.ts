@@ -32,13 +32,66 @@ console.log(
 
 const testInput = `xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))`
 
+let matches = []
+let latest = ''
+
+for(let i =0; i< testInput.length; i++){
+  const currentChar = testInput[i]
+
+  if(latest.length === 0){ // start queue
+    if(currentChar === 'm'){
+      latest += currentChar
+    }
+  } else {
+    if(latest.length === 1){
+      if(currentChar === 'u'){
+        latest += currentChar
+      } else {
+        latest = ''
+      }
+    } else if (latest.length === 2){
+      if(currentChar === 'l'){
+        latest += currentChar
+      } else {
+        latest = ''
+      }
+    } else if(latest.length === 3){
+      if(currentChar === '('){
+        latest += currentChar
+      } else {
+        latest = ''
+      }
+    } else if( latest.length === 4 ){
+      const numAttempt = Number(currentChar)
+      if(!isNaN(numAttempt)){
+        latest += currentChar
+
+        //temporary
+        matches.push(latest)
+        latest = ''
+      } else {
+        latest = ''
+      }
+    }
+  }
+}
+
+console.log(matches)
 // traverse string via pop & queue
   // find matches for mul(X,Y) -- X and Y are 1-3 digits max 
     // escape early and continue if no match -- use regex??
   // if found full-match
     // sum += multiplication
 
-
+const PATTERNS = {
+  1: /^m$/, //m
+  2: /^mu$/, //mu
+  3: /^mul$/, //mul
+  4: /^mul\($/, //mul(
+  5: /^mul\((\d{1,3})$/,
+  6: /^mul\((\d{1,3})\)$/,
+  7: /^mul\((\d{1,3})\),$/
+}
 const partialMatchRegex = /^mul\((\d{1,3})\),$/ // mul(1, mul(12, mul(123,
 const fullMatchRegex = /^mul\(\d{1,3},\d{1,3}$/ // mul(1,12) etc.
 
