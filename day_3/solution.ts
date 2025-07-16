@@ -32,12 +32,15 @@ console.log(
 
 const testInput = `xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))`
 
-
 // traverse string via pop & queue
   // find matches for mul(X,Y) -- X and Y are 1-3 digits max 
     // escape early and continue if no match -- use regex??
   // if found full-match
     // sum += multiplication
+
+
+const partialMatchRegex = /^mul\((\d{1,3})\),$/ // mul(1, mul(12, mul(123,
+const fullMatchRegex = /^mul\(\d{1,3},\d{1,3}$/ // mul(1,12) etc.
 
 
 
