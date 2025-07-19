@@ -1,11 +1,11 @@
 // Part 1: https://adventofcode.com/2024/day/4
 
-import { test1 } from "./input"
+import { test1, actualCase } from "./input"
 const KEY_WORD = 'XMAS'
 type Direction = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW'
 
-
-function makeMatrix(longString: string){
+/** Convert string to matrix */
+function makeMatrix(longString: string): string [][]{
   const rows = longString.split('\n')
   return rows.map(row => row.split(''))
 }
@@ -43,50 +43,13 @@ function getHeight(matrix: string[][]){
 function getWidth(matrix: string[][]){
   return matrix[0].length
 }
-
-const matrix_1 = makeMatrix(test1)
-
-let XMAS_COUNT: {
-  [key: string]: number
-} = {}
-const width = getWidth(matrix_1)
-const height = getHeight(matrix_1)
-
+/** Get value of a cell from a 2d matrix */
 function getValue(matrix: string[][], coordinates: [number, number]){
   const [row, col] = coordinates
   return matrix[row][col]
 }
 
-const directions = ['N', 'S', 'E', 'W', 'NW', 'NE', 'SE', 'SW'] as Direction[]
-
-for(let row=0; row < height; row++){
-  for(let col=0; col < width; col ++){
-    const currentPosition: [number, number] = [row, col]
-
-    // found "M"
-    if(getValue(matrix_1, currentPosition) === KEY_WORD[0]){
-
-
-      directions.forEach(dir => {
-        if(findWordInOneDirection(
-          matrix_1,
-          KEY_WORD,
-          currentPosition,
-          height,
-          width,
-          dir
-        )){
-          if(XMAS_COUNT[dir]){
-            XMAS_COUNT[dir]++
-          }else{
-            XMAS_COUNT[dir] = 1
-          }
-        }
-      })
-    }
-  }
-}
-
+/** Starting from an initial cell, check a single direction to see if the adjacent letters match the key word. if not escape early */
 function findWordInOneDirection(matrix:string[][], key_word:string, startingPosition:[number, number], height:number, width:number, direction:Direction): boolean{
   let lastCoordinate = startingPosition
   let foundLetters = key_word[0]
@@ -113,6 +76,48 @@ function findWordInOneDirection(matrix:string[][], key_word:string, startingPosi
   return false
 }
 
-console.log(XMAS_COUNT)
-console.log(Object.values(XMAS_COUNT).reduce((accumulator, currentValue) => accumulator + currentValue,
-  0))
+function normalCrossWordSearch(crossword: string, key_word: string, validDirections: Direction[]): [
+  { [key:string] : number }, number
+] {
+  const matrix = makeMatrix(crossword)
+  const width = getWidth(matrix)
+  const height = getHeight(matrix)
+
+  let cache: { [key:string]: number } = {}
+
+  // traverse each cell in each row
+  for(let row=0; row < height; row++){
+    for(let col=0; col < width; col ++){
+
+      const currentPosition: [number, number] = [row, col]
+
+      // found first char
+      if(getValue(matrix, currentPosition) === key_word[0]){
+        directions.forEach(dir => {
+          if(findWordInOneDirection(
+            matrix,
+            key_word,
+            currentPosition,
+            height,
+            width,
+            dir
+          )){
+            if(cache[dir]){
+              cache[dir]++
+            }else{
+              cache[dir] = 1
+            }
+          }
+        })
+      }
+    }
+  }
+  const sum = Object.values(cache).reduce((acc, current) => acc + current, 0)
+  return [cache, sum]
+}
+
+const directions = ['N', 'S', 'E', 'W', 'NW', 'NE', 'SE', 'SW'] as Direction[]
+
+const result = normalCrossWordSearch(actualCase, KEY_WORD, directions)
+console.log(result[0])
+console.log(result[1])
