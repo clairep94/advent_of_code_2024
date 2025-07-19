@@ -8,7 +8,7 @@ function parseInput(input: string): [
   return [initial[0], initial[1].map(el => el.split(','))]
 }
 
-const [rules, printed] = parseInput(testInput)
+const [rules, printed] = parseInput(actualInput)
 
 function findElementsThatNeedToBeAfter(num: string): string[]{
   return rules.filter(el => el.startsWith(`${num}|`)).map(el => {
