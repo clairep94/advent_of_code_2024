@@ -57,7 +57,7 @@ function getValue(matrix: string[][], coordinates: [number, number]){
   return matrix[row][col]
 }
 
-const directions = ['E', 'W'] as Direction[]
+const directions = ['N', 'S', 'E', 'W', 'NW', 'NE', 'SE', 'SW'] as Direction[]
 
 for(let row=0; row < height; row++){
   for(let col=0; col < width; col ++){
@@ -101,7 +101,6 @@ function findWordInOneDirection(matrix:string[][], key_word:string, startingPosi
     foundLetters += currentLetter
 
     if(currentLetter !== key_word[i]) {
-      console.log('broken:', direction, foundLetters) 
       break 
     }
     if(foundLetters === key_word){
@@ -115,3 +114,5 @@ function findWordInOneDirection(matrix:string[][], key_word:string, startingPosi
 }
 
 console.log(XMAS_COUNT)
+console.log(Object.values(XMAS_COUNT).reduce((accumulator, currentValue) => accumulator + currentValue,
+  0))
