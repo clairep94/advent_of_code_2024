@@ -17,12 +17,20 @@ function findAdjacentUnit(coordinates: [number, number], height: number, width: 
   switch(direction) {
     case "N": 
       return (y-1 >= 0) ? [y-1,x] : undefined
+    case "NE": 
+      return (y-1 >= 0) && (x+1 < width)  ? [y-1,x+1] : undefined
     case "E": 
       return (x+1 < width) ? [y,x+1] : undefined
+    case "SE":
+      return (y+1 < height) && (x+1 < width) ? [y+1,x+1] : undefined
     case "S":
       return (y+1 < height) ? [y+1,x] : undefined
+    case "SW":
+      return (y+1 < height) && (x-1 > 0) ? [y+1,x-1] : undefined
     case "W":
       return (x-1 > 0) ? [y,x-1] : undefined
+    case "NW": 
+      return (y-1 >= 0) && (x-1 > 0) ? [y-1,x-1] : undefined
 
     default:
       return [y, x]
@@ -37,16 +45,6 @@ function getWidth(matrix: string[][]){
 }
 
 const matrix_1 = makeMatrix(test1)
-// console.log(matrix_1)
-
-console.log(
-  findAdjacentUnit(
-    [9,9],
-    getWidth(matrix_1),
-    getHeight(matrix_1),
-    'E'
-  )
-)
 
 let E_XMAS = []
 const width = getWidth(matrix_1)
@@ -63,15 +61,16 @@ for(let row=0; row < height; row++){
 
     // found "M"
     if(getValue(matrix_1, currentPosition) === KEY_WORD[0]){
+
+      // try to find word in 1 direction:
       console.log('Found X at:', currentPosition)
       let lastCoordinate = currentPosition
       let currentWord = KEY_WORD[0]
 
-      // check each adjacent letter in one direction
       for(let i=1; i < KEY_WORD.length; i++){
         const currentCoordinate = findAdjacentUnit(lastCoordinate, height, width, 'E')
         if(!currentCoordinate){ 
-          break 
+          break // reached edge
         }
 
         const currentLetter = getValue(matrix_1, currentCoordinate)
