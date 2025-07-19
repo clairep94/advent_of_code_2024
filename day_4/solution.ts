@@ -131,4 +131,86 @@ console.log(result[1])
 // Part 2: https://adventofcode.com/2024/day/4#part2
 function xCrossWordSearch(crossword:string, key_word: string){
 
+  const matrix = makeMatrix(crossword)
+  const width = getWidth(matrix)
+  const height = getHeight(matrix)
+
+  let positions: [number, number][] = []
+  let count: number = 0
+
+  const [middleLetter, leftHalf, rightHalf] = findCrossing(key_word) // a, am*, as
+
+  // traverse each cell in each row
+  for (let row=0; row < height; row++){
+    for(let col=0; col < width; col ++){
+
+      const currentPosition: [number, number] = [row, col]
+
+      // found middle letter:
+      if(getValue(matrix, currentPosition) === middleLetter){
+        if(
+          /**
+           * M.S
+           * .A.
+           * M.S
+           */
+          (
+            ['NE', 'SE'].every(dir => findWordInOneDirection(matrix, rightHalf, currentPosition, height, width, dir as Direction)) &&
+            ['NW', 'SW'].every(dir => findWordInOneDirection(matrix, leftHalf, currentPosition, height, width, dir as Direction))
+          ) ||
+          (
+            /**
+             * S.M
+             * .A.
+             * S.M
+             */
+            ['NW', 'SW'].every(dir => findWordInOneDirection(matrix, rightHalf, currentPosition, height, width, dir as Direction)) &&
+            ['NE', 'SE'].every(dir => findWordInOneDirection(matrix, leftHalf, currentPosition, height, width, dir as Direction))
+          ) ||
+          (
+            /**
+             * S.S
+             * .A.
+             * M.M
+             */
+            ['NW', 'NE'].every(dir => findWordInOneDirection(matrix, rightHalf, currentPosition, height, width, dir as Direction)) &&
+            ['SW', 'SE'].every(dir => findWordInOneDirection(matrix, leftHalf, currentPosition, height, width, dir as Direction))
+          ) ||
+          (
+            /**
+             * M.M
+             * .A.
+             * S.S
+             */
+            ['SW', 'SE'].every(dir => findWordInOneDirection(matrix, rightHalf, currentPosition, height, width, dir as Direction)) &&
+            ['NW', 'NE'].every(dir => findWordInOneDirection(matrix, leftHalf, currentPosition, height, width, dir as Direction))
+          ) 
+        ){
+          positions.push(currentPosition)
+          count++
+        }
+      }
+    }
+  }
+  return [positions, count]
 }
+
+/** find middle letter, left half (reversed) and right half -- MAS --> A, AM, AS */
+function findCrossing(word: string){
+  if(word.length % 2 === 0){ throw new Error('key word length must be odd')}
+
+  const middleIndex = Math.floor(word.length/2) // eg. 5 letters, middle is index-2
+  const middleLetter = word[middleIndex]
+  const leftHalf = word.slice(0, middleIndex + 1).split('').reverse().join('') // reversed
+  const rightHalf = word.slice(middleIndex)
+
+  return [middleLetter, leftHalf, rightHalf]
+}
+
+console.log(
+  findCrossing('smart')
+)
+
+console.log('part 2:')
+console.log(xCrossWordSearch(test1, 'MAS'))
+console.log(xCrossWordSearch(actualCase, 'MAS'))
