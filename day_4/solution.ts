@@ -76,7 +76,12 @@ function findWordInOneDirection(matrix:string[][], key_word:string, startingPosi
   return false
 }
 
-function normalCrossWordSearch(crossword: string, key_word: string, validDirections: Direction[]): [
+/**
+ * Translate string into 2d matrix
+ * traverse matrix, and if the current letter matches the keyword's first letter:
+ *   check for full matches to the keyword. increment count/cache if so; otherwise escape early.
+ */
+function normalCrossWordSearch(crossword: string, key_word: string, validDirections: Direction[] = directions): [
   { [key:string] : number }, number
 ] {
   const matrix = makeMatrix(crossword)
@@ -93,7 +98,7 @@ function normalCrossWordSearch(crossword: string, key_word: string, validDirecti
 
       // found first char
       if(getValue(matrix, currentPosition) === key_word[0]){
-        directions.forEach(dir => {
+        validDirections.forEach(dir => {
           if(findWordInOneDirection(
             matrix,
             key_word,
@@ -121,3 +126,9 @@ const directions = ['N', 'S', 'E', 'W', 'NW', 'NE', 'SE', 'SW'] as Direction[]
 const result = normalCrossWordSearch(actualCase, KEY_WORD, directions)
 console.log(result[0])
 console.log(result[1])
+
+
+// Part 2: https://adventofcode.com/2024/day/4#part2
+function xCrossWordSearch(crossword:string, key_word: string){
+
+}
