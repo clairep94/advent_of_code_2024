@@ -26,11 +26,11 @@ function findAdjacentUnit(coordinates: [number, number], height: number, width: 
     case "S":
       return (y+1 < height) ? [y+1,x] : undefined
     case "SW":
-      return (y+1 < height) && (x-1 > 0) ? [y+1,x-1] : undefined
+      return (y+1 < height) && (x-1 >= 0) ? [y+1,x-1] : undefined
     case "W":
-      return (x-1 > 0) ? [y,x-1] : undefined
+      return (x-1 >= 0) ? [y,x-1] : undefined
     case "NW": 
-      return (y-1 >= 0) && (x-1 > 0) ? [y-1,x-1] : undefined
+      return (y-1 >= 0) && (x-1 >= 0) ? [y-1,x-1] : undefined
 
     default:
       return [y, x]
