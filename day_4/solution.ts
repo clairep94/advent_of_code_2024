@@ -46,7 +46,9 @@ function getWidth(matrix: string[][]){
 
 const matrix_1 = makeMatrix(test1)
 
-let E_XMAS = []
+let XMAS_COUNT: {
+  [key: string]: number
+} = {}
 const width = getWidth(matrix_1)
 const height = getHeight(matrix_1)
 
@@ -55,6 +57,8 @@ function getValue(matrix: string[][], coordinates: [number, number]){
   return matrix[row][col]
 }
 
+const directions = ['E', 'W'] as Direction[]
+
 for(let row=0; row < height; row++){
   for(let col=0; col < width; col ++){
     const currentPosition: [number, number] = [row, col]
@@ -62,29 +66,52 @@ for(let row=0; row < height; row++){
     // found "M"
     if(getValue(matrix_1, currentPosition) === KEY_WORD[0]){
 
-      // try to find word in 1 direction:
-      console.log('Found X at:', currentPosition)
-      let lastCoordinate = currentPosition
-      let currentWord = KEY_WORD[0]
 
-      for(let i=1; i < KEY_WORD.length; i++){
-        const currentCoordinate = findAdjacentUnit(lastCoordinate, height, width, 'E')
-        if(!currentCoordinate){ 
-          break // reached edge
+      directions.forEach(dir => {
+        if(findWordInOneDirection(
+          matrix_1,
+          KEY_WORD,
+          currentPosition,
+          height,
+          width,
+          dir
+        )){
+          if(XMAS_COUNT[dir]){
+            XMAS_COUNT[dir]++
+          }else{
+            XMAS_COUNT[dir] = 1
+          }
         }
-
-        const currentLetter = getValue(matrix_1, currentCoordinate)
-        console.log('Adjacent letter:', currentCoordinate, currentLetter)
-        if(currentLetter !== KEY_WORD[i]) { break }
-        
-        currentWord += currentLetter
-        if(i === KEY_WORD.length-1){
-          E_XMAS.push(currentWord)
-        }
-        lastCoordinate = currentCoordinate
-      }
+      })
     }
   }
 }
 
-console.log(E_XMAS)
+function findWordInOneDirection(matrix:string[][], key_word:string, startingPosition:[number, number], height:number, width:number, direction:Direction): boolean{
+  let lastCoordinate = startingPosition
+  let foundLetters = key_word[0]
+
+  for(let i=1; i < key_word.length; i++){
+    const currentCoordinate = findAdjacentUnit(lastCoordinate, height, width, direction)
+    if(!currentCoordinate){ 
+          break // reached edge
+    }
+
+    const currentLetter = getValue(matrix, currentCoordinate)
+    foundLetters += currentLetter
+
+    if(currentLetter !== key_word[i]) {
+      console.log('broken:', direction, foundLetters) 
+      break 
+    }
+    if(foundLetters === key_word){
+      return true // should push or increment found count
+    }
+
+    lastCoordinate = currentCoordinate
+  }
+
+  return false
+}
+
+console.log(XMAS_COUNT)
